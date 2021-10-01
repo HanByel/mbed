@@ -5,7 +5,6 @@
 #include "mbed.h"
 
 
-#define MAXIMUM_BUFFER_SIZE 32
 
 
 
@@ -33,12 +32,14 @@ public:
 public:
     void uartInit();
     void sendUartData(const void *_buf, size_t _length);
-    void getUartData(char arr[]);
-    void setUartData();
+    void receiveUartData();
+    void getUartData(char *arr);
+    void testUart();
 
 private:
     char mBuff[MAXIMUM_BUFFER_SIZE]={0,};
-
+    char mZBuff[MAXIMUM_BUFFER_SIZE]={0,};
+    int Uartcnt = 0;
 };
 
 

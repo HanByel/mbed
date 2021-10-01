@@ -1,4 +1,4 @@
-  // CAN Command Packet Structure ///
+ // CAN Command Packet Structure ///
   // 16 bit position command, between -4*pi and 4*pi
   // 12 bit velocity command, between -30 and + 30 rad/s
   // 12 bit kp, between 0 and 500 N-m/rad
@@ -31,4 +31,3 @@
 
 ParameterRange::ParameterRange(float pMin, float pMax, float vMin, float vMax, float tMin, float tMax, float kpMin, float kpMax, float kdMin, float kdMax)
 ParameterRange range(-95.5f, 95.5f, -45.0f, 45.0f, -18.0f, 18.0f, 0.0f, 500.0f, 0.0f, 5.0f);
-

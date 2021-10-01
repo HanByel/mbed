@@ -1,3 +1,10 @@
+/* 
+ * 2021-09-30 Minicheeta test version
+ * Communication class
+ * CAN / UART
+ */
+
+
 #include "hCommunication.hpp"
 
 hCommunication* hCommunication::mp_Instance=NULL;
@@ -37,6 +44,7 @@ void hCommunication::canInit(){
 
 void hCommunication::canSendData(unsigned int _canId, unsigned int _id, const unsigned char *_data, unsigned char _len, CANType _type, CANFormat _format){
     CANMessage lmsg=CANMessage(_id, _data, _len, _type, _format);
+
     switch(_canId){
         case 1:{
             mcan1.write(lmsg);
@@ -53,7 +61,7 @@ void hCommunication::canSendData(unsigned int _canId, unsigned int _id, const un
         }
         #endif
         default:{
-        printf("canSendData() CAN_Select_Error\n");
+            
         break;
         }
     }
@@ -63,7 +71,7 @@ void hCommunication::canSendData(unsigned int _canId, unsigned int _id, const un
 CANMessage hCommunication::canRecieveData(){
     CANMessage msg;
     if (mcan1.read(msg)) {
-        printf("Message received: %x, %x, %x, %x, %x, %x, %x, %x\n", msg.data[0], msg.data[1], msg.data[2], msg.data[3], msg.data[4], msg.data[5], msg.data[6], msg.data[7]);
+
     }
     
     return msg;
@@ -74,7 +82,6 @@ posSt hCommunication::canRecievePosData(){
     posSt posMSG;
     CANMessage msg;
     if (mcan1.read(msg)) {
-//        printf("Message received: %x, %x, %x, %x, %x, %x, %x, %x\n", msg.data[0], msg.data[1], msg.data[2], msg.data[3], msg.data[4], msg.data[5], msg.data[6], msg.data[7]);
     posMSG.data1 = msg.data[1];
     posMSG.data2 = msg.data[2];
     }
@@ -87,18 +94,17 @@ void hCommunication::getPosInt(signed short &_IntVal){
     posSt posMSG;
     CANMessage msg;
     if (mcan1.read(msg)) {
-//        printf("Message received: %x, %x, %x, %x, %x, %x, %x, %x\n", msg.data[0], msg.data[1], msg.data[2], msg.data[3], msg.data[4], msg.data[5], msg.data[6], msg.data[7]);
     posMSG.data1 = msg.data[1];
     posMSG.data2 = msg.data[2];
     }
-    _IntVal = posMSG.data1 << 8 | posMSG.data2;
+    _IntVal = posMSG.data1 << 8 | posMSG.data2; // char = 8bit(256), -> used two char values for positioning
     _IntVal -=32767;
-    //printf("Message received: %d %d %d\n", _IntVal, msg.data[1], msg.data[2]);
 }
 
 
 
 void hCommunication::uartInit(){
+    printf("UART INIT\n");
     serial_port.set_baud(115200);
     serial_port.set_format(8, BufferedSerial::None, 1);
 }
@@ -107,13 +113,41 @@ void hCommunication::sendUartData(const void *_buf, size_t _length){
     serial_port.write(_buf, _length);
 }
 
-void hCommunication::getUartData(char *arr){
-    if(uint32_t num = serial_port.read(mBuff, sizeof(mBuff))){
-        for(int i = 0; i < MAXIMUM_BUFFER_SIZE ; i++){
-            arr[i] = mBuff[i];
+
+void hCommunication::receiveUartData(){
+    char lBuff[MAXIMUM_BUFFER_SIZE]={0,};
+    if(uint32_t num = serial_port.read(lBuff, sizeof(lBuff))){
+        hCommunication::getInstance().sendUartData(lBuff,sizeof(lBuff));
+        for(int i = 0; i < MAXIMUM_BUFFER_SIZE; i++){
+            if(lBuff[i]==0){
+                break;
+            }
+            else if(lBuff[i]==13){
+                mBuff[Uartcnt]=lBuff[i];
+                Uartcnt = 0;
+                hCommon::getInstance().setUartData(mBuff);
+                for(int i = 0 ; i < MAXIMUM_BUFFER_SIZE ; i++)  mBuff[i]=0;
+            }
+            else{
+                mBuff[Uartcnt]=lBuff[i];
+                Uartcnt++;
+            }
         }
     }
+    else{
+    }
 }
-void hCommunication::setUartData(){
+
+void hCommunication::getUartData(char *arr){
+    for(int i = 0 ; i < MAXIMUM_BUFFER_SIZE ; i++)   arr[i] = mBuff[i];
+
+}
+
+void hCommunication::testUart(){
+    char buf[MAXIMUM_BUFFER_SIZE] = {0};
+
+    if (uint32_t num = serial_port.read(buf, sizeof(buf))) {
+        serial_port.write(buf, num);
+    }
 
 }

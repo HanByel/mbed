@@ -8,6 +8,10 @@
 #include "mbed.h"
 
 
+#define oneDegree 45
+#define MAXIMUM_BUFFER_SIZE 50
+#define MAXIMUM_MOTOR_NUMBER 12
+
 struct posSt{
     unsigned char data1;
     unsigned char data2;
@@ -31,9 +35,21 @@ public:
     void setBoardValue();
     void getBoardValue(int &_boardVal);
     void hTimerFunc(int _timer, float _time, void *_func());
+    void convertingtDegree(float _degree, unsigned char *_dataVal);
+
+public:
+    void getAllDegreeData(int *arr);
+    void setUartData(char *arr);
+    void convUart2DegreeData();
 
 private:
     void boardList();
+    
+private:
+    char mUartBuff[MAXIMUM_BUFFER_SIZE]={0,};
+    signed int mDegreeBuff[MAXIMUM_MOTOR_NUMBER]={0,};
+    char mZBuff[MAXIMUM_BUFFER_SIZE]={0,};
+    int Uartcnt = 0;
 
 };
 

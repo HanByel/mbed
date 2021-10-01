@@ -4,15 +4,15 @@
 #include "hCommunication.hpp"
 #include "hcommon.hpp"
 #include <string.h>
-
-
+#define MAXIMUM_MOTOR_NUMBER 12
 
 int mainLoop();
 void mainInit();
-void canInit();
-void motorInit();
-void MotorCntTorque();
+void communicationInit();
+void motorInit(int _canNum = 1, int _motorNum = 1);
+void testMotorCntTorque();
 void MotorCntPos();
+void testMotorCntPos();
 
 
 
