@@ -1,5 +1,5 @@
 /* 
- * 2021-09-30 Minicheeta test version
+ * 2021-09-30 Minicheeta
  * Communication class
  * CAN / UART
  */
@@ -42,6 +42,17 @@ void hCommunication::canInit(){
 
 }
 
+
+/** 2021-10-15  HanByel
+ * get degree function
+ * Can get ALL degree data using this function
+ * param unsigned int _canId : CAN ID
+ * param unsigned int _id : Motor ID
+ * param const unsigned char *_data : Protocol Data
+ * param unsigned char _len : Data length
+ * param CANType _type : CAN Type
+ * param CANFormat _format : CAN Format
+ */
 void hCommunication::canSendData(unsigned int _canId, unsigned int _id, const unsigned char *_data, unsigned char _len, CANType _type, CANFormat _format){
     CANMessage lmsg=CANMessage(_id, _data, _len, _type, _format);
 
@@ -68,6 +79,9 @@ void hCommunication::canSendData(unsigned int _canId, unsigned int _id, const un
 }
 
 
+/** 2021-10-15  HanByel
+ * TEST code for Recieve CAN data
+ */
 CANMessage hCommunication::canRecieveData(){
     CANMessage msg;
     if (mcan1.read(msg)) {
@@ -78,6 +92,9 @@ CANMessage hCommunication::canRecieveData(){
 }
 
 
+/** 2021-10-15  HanByel
+ * TEST code for Recieve CAN data and set
+ */
 posSt hCommunication::canRecievePosData(){
     posSt posMSG;
     CANMessage msg;
@@ -90,6 +107,11 @@ posSt hCommunication::canRecievePosData(){
 }
 
 
+/** 2021-10-15  HanByel
+ * get degree function
+ * Can get ALL degree data using this function
+ * param signed short &_IntVal : Merging Two bit CAN DATA
+ */
 void hCommunication::getPosInt(signed short &_IntVal){
     posSt posMSG;
     CANMessage msg;
@@ -102,18 +124,30 @@ void hCommunication::getPosInt(signed short &_IntVal){
 }
 
 
-
+/** 2021-10-15  HanByel
+ * uart init
+ */
 void hCommunication::uartInit(){
     printf("UART INIT\n");
     serial_port.set_baud(115200);
     serial_port.set_format(8, BufferedSerial::None, 1);
 }
 
+
+/** 2021-10-15  HanByel
+ * Send data with uart
+ * param const void *_buf : buffer, trying to send
+ * param size_t _length : buffer size
+ */
 void hCommunication::sendUartData(const void *_buf, size_t _length){
     serial_port.write(_buf, _length);
 }
 
 
+/** 2021-10-15  HanByel
+ * Recieve data with uart
+ * Using this for test
+ */
 void hCommunication::receiveUartData(){
     char lBuff[MAXIMUM_BUFFER_SIZE]={0,};
     if(uint32_t num = serial_port.read(lBuff, sizeof(lBuff))){
@@ -138,11 +172,20 @@ void hCommunication::receiveUartData(){
     }
 }
 
+
+/** 2021-10-15  HanByel
+ * get Data from Uart
+ * param char *arr : buffer
+ */
 void hCommunication::getUartData(char *arr){
     for(int i = 0 ; i < MAXIMUM_BUFFER_SIZE ; i++)   arr[i] = mBuff[i];
 
 }
 
+
+/** 2021-10-15  HanByel
+ * TESTCODE for recieve
+ */
 void hCommunication::testUart(){
     char buf[MAXIMUM_BUFFER_SIZE] = {0};
 

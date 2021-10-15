@@ -1,5 +1,5 @@
 /* 
- * 2021-09-30 Minicheeta test version
+ * 2021-10-15 Minicheeta
  * Common class
  * convert data / calculate data
  */
@@ -33,6 +33,9 @@ void hCommon::hTimerFunc(int _timer, float _time, void *_func()){
 }
 
 
+/** 2021-10-15  HanByel
+ * Set Board Type
+ */
 void hCommon::setBoardValue(){
     int lCnt=0;
     list<string>::iterator l_it=mBoardList.begin();
@@ -48,6 +51,9 @@ void hCommon::setBoardValue(){
 }
 
 
+/** 2021-10-15  HanByel
+ * Get Board Type
+ */
 void hCommon::getBoardValue(int &_boardVal){
     _boardVal=mBoardValue;
 }
@@ -59,7 +65,11 @@ void hCommon::boardList(){
 }
 
 
-//--------convert from float degree to character data[2 bytes]
+/** 2021-10-15  HanByel
+ * convert from float degree to character data
+ * param float _degree : Degree data
+ * param unsigned char *_dataVal : 2 bit position data (array) {pos1,pos2}
+ */
 void hCommon::convertingtDegree(float _degree, unsigned char *_dataVal){
 	_degree *= 7;
 	_degree += 32767;
@@ -68,20 +78,33 @@ void hCommon::convertingtDegree(float _degree, unsigned char *_dataVal){
 }
 
 
-//--------get degree
+/** 2021-10-15  HanByel
+ * get degree function
+ * Can get ALL degree data using this function
+ * param int *arr : array degree data
+ */
 void hCommon::getAllDegreeData(int *arr){
     for(int i = 0 ; i < MAXIMUM_MOTOR_NUMBER ; i++)         arr[i] = mDegreeBuff[i];
 }
 
 
-//--------set uart data to this class
+/** 2021-10-15  HanByel
+ * set uart data to this class
+ * Set degree data with uart interface
+ */
 void hCommon::setUartData(char *arr){
     for(int i = 0 ; i < MAXIMUM_BUFFER_SIZE ; i++)   mUartBuff[i]=arr[i];
     hCommon::getInstance().convUart2DegreeData();
 }
 
 
-//--------converting uart data to degreedata as integer // less than the number of three figures
+//--------
+/** 2021-10-15  HanByel
+ * convert UART data, gained with UART, to Degree data
+ * Set degree data from uart interface
+ * converting uart data to degreedata as integer 
+ * less than the number of three figures
+ */
 void hCommon::convUart2DegreeData(){
     int convCnt=0;
     int p=0;

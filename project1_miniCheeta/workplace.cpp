@@ -1,6 +1,5 @@
 /* 
- * 2021-09-30 Minicheeta test version
- * Workspace
+ * Minicheeta Workspace
  */
 
 #include "workplace.hpp"
@@ -18,6 +17,9 @@ unsigned char PosG360Cmd[8] = {0x89, 0xd6, 0x7f, 0xf0, 0x08, 0x33, 0x37, 0xff};
 unsigned char PosG0Cmd[8] = {0x7f, 0xff, 0x7f, 0xf0, 0x08, 0x33, 0x37, 0xff};
 */
 
+/** 2021-10-15  HanByel
+ * TEST Command
+ */
 unsigned char motorStartCmd[8] = {0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xfC};
 unsigned char motorEndCmd[8] = {0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xfD};
 unsigned char motorSetCmd[8] = {0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xfE};
@@ -27,6 +29,9 @@ unsigned char PosGCmd[8] = {0x7f, 0xff, 0x7f, 0xf0, 0x0a, 0x33, 0x37, 0xff};
 int mAllDegreeVal[MAXIMUM_MOTOR_NUMBER] = {0,}; //  composed degree as integer
 
 
+/** 2021-10-15  HanByel
+ * Set values for control in this workspace
+ */
 posSt RReceivedPosData;
 posSt OReceivedPosData;
 posSt EPosData = {0,};
@@ -42,13 +47,16 @@ int D_gain = 100;
 
 signed short posVal = 0;
 
-//--------Main init
+/** 2021-10-15  HanByel
+ * Main Init
+ */
 void mainInit(){
     hCommon::getInstance().setBoardValue();
 }
 
-
-//--------Communication init
+/** 2021-10-15  HanByel
+ * Communication init
+ */
 void communicationInit(){
     printf("canInit()\n");
     //hCommunication::getInstance().canInit();  //can init
@@ -56,19 +64,25 @@ void communicationInit(){
 }
 
 
-//--------Motor init
-void motorInit(int _MCanNum, int _SCanNum){
-    printf("Motor Init CAN ID : %d, Motor ID : %d\n", _MCanNum, _SCanNum);
-    hCommunication::getInstance().canSendData(_MCanNum,_SCanNum,motorEndCmd,8); //Turn off a motor
+/** 2021-10-15  HanByel
+ * motorInit init
+ * param int _Cid : CAN ID
+ * param int _Mid : Motor ID
+ */
+void motorInit(int _Cid, int _Mid){
+    printf("Motor Init CAN ID : %d, Motor ID : %d\n", _Cid, _Mid);
+    hCommunication::getInstance().canSendData(_Cid,_Mid,motorEndCmd,8); //Turn off a motor
     ThisThread::sleep_for(10ms);
-    hCommunication::getInstance().canSendData(_MCanNum,_SCanNum,motorStartCmd,8); //Turn on a motor
+    hCommunication::getInstance().canSendData(_Cid,_Mid,motorStartCmd,8); //Turn on a motor
     ThisThread::sleep_for(10ms);
-    hCommunication::getInstance().canSendData(_MCanNum,_SCanNum,motorSetCmd,8); // activate a motor
+    hCommunication::getInstance().canSendData(_Cid,_Mid,motorSetCmd,8); // Set zero pos
     ThisThread::sleep_for(10ms);
 }
 
 
-//--------Motor Torque Test Function
+/** 2021-10-15  HanByel
+ * TESTCODE : Motor Control with Torque
+ */
 void testMotorCntTorque(){
     OReceivedPosData = RReceivedPosData;
     OEPosData = EPosData;
@@ -104,17 +118,22 @@ void testMotorCntTorque(){
 }
 
 
-//--------Motor Position Mode Function
+/** 2021-10-15  HanByel
+ * Position control implementation function
+ */
 void MotorCntPos(){
     for(int i = 0; i < MAXIMUM_MOTOR_NUMBER ; i++){
         hCommon::getInstance().convertingtDegree(mAllDegreeVal[i],PosGCmd);
-        hCommunication::getInstance().canSendData(1,6,PosGCmd);
-        ThisThread::sleep_for(1ms);
+        hCommunication::getInstance().canSendData(1,i+1,PosGCmd);
+        ThisThread::sleep_for(10ms);
     }
 }
 
 
-//--------Motor Position TEST Mode Function
+/** 2021-10-15  HanByel
+ * TESTCODE : Motor Control with Position Mode
+ * param testCnt : Test Count
+ */
 int testCnt = 0;
 void testMotorCntPos(){
     if(testCnt%4==0){
@@ -137,41 +156,50 @@ void testMotorCntPos(){
 }
 
 
-//--------Thread : Recieve deree data from common class
-void recieveData(){
+/** 2021-10-15  HanByel
+ * recieve all degrees Data from communication class
+ */
+ void recieveData(){
     printf("recieveData()_start\n");
     while(1){
         hCommon::getInstance().getAllDegreeData(mAllDegreeVal);
-        ThisThread::sleep_for(10ms);
+        ThisThread::sleep_for(1ms);
     }
     printf("recieveData()_end\n");
 }
 
 
-//--------Thread : Send a packet to a motor
+/** 2021-10-15  HanByel
+ * Loop of Motor control with position mode
+ * Can change Mode from here
+ */
 void canSendMotorData(){
     printf("canSendMotorData()_start\n");
     while(1){
-        MotorCntPos();
-        ThisThread::sleep_for(10ms);
+        MotorCntPos();              //change function from here
+        ThisThread::sleep_for(1ms);
     }
     printf("canSendMotorData()_end\n");
 }
 
 
-//--------Thread : Recieve encoder data from a motor -- need to modify ( not use for position test )
+/** 2021-10-15  HanByel
+ * LOOP of Getting position Data from Motor
+ */
 void canRecieveMotorData(){
     printf("canRecieveMotorData()_start\n");
     while(1){
         hCommunication::getInstance().getPosInt(posVal);
-        ThisThread::sleep_for(10ms);
+        ThisThread::sleep_for(1ms);
         //printf("%x\n",PosGCmd[1]);
     }
     printf("canRecieveMotorData()_end\n");
 }
 
 
-//--------Main Loop involves all threads start
+/** 2021-10-15  HanByel
+ * SETUP and MAINLOOP
+ */
 int mainLoop(){
     CANMessage Receivedmsg;
     char ldata22[MAXIMUM_BUFFER_SIZE] = {0,};

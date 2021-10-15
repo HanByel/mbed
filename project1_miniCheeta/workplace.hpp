@@ -9,7 +9,7 @@
 int mainLoop();
 void mainInit();
 void communicationInit();
-void motorInit(int _canNum = 1, int _motorNum = 1);
+void motorInit(int _Cid=1, int _Mid=1);
 void testMotorCntTorque();
 void MotorCntPos();
 void testMotorCntPos();
